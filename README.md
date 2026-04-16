@@ -61,4 +61,8 @@ python3 8APF.py
 7. Conclusion
 The system successfully integrates perception and planning, producing efficient and robust motion in complex environments.
 
+Reference work-- 
+
+D. Prajapati, A. Mehra, P. Kumar, A. Rana, S. K. Surya Prakash and A. Shukla, "MPPF: Mobile Probe Potential Field for Real-Time Multi-Agent Navigation in Industrial Environments," in IEEE Access, vol. 14, pp. 11084-11095, 2026, doi: 10.1109/ACCESS.2026.3655886.
+
 Author: Ashish
