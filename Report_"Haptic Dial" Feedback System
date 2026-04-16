@@ -1,0 +1,91 @@
+Haptic Dial Feedback System – PID Control Report
+
+## 1. Implementation Task
+
+### 1.1 PID Controller with Anti-Windup
+
+A proportional–integral–derivative (PID) controller was implemented to regulate system response based on the error between the desired setpoint and the measured output. The controller computes three components:
+
+* **Proportional (P):** Reacts to current error
+* **Integral (I):** Accumulates past error
+* **Derivative (D):** Predicts future error trend
+
+To address actuator saturation, an **anti-windup mechanism** was incorporated by clamping the integral term within predefined bounds.
+
+**Rationale:**
+When a motor reaches a physical hard-stop, it cannot move further despite the presence of error. In such conditions, the integral term may continue accumulating, leading to excessive control output. This results in significant overshoot or instability once the constraint is removed. By limiting the integral term, the controller avoids this undesirable buildup, ensuring stable and predictable behavior.
+
+---
+
+### 1.2 Derivative Filtering
+
+The derivative term was implemented using a **first-order low-pass filter**:
+
+* Raw derivative is computed from the change in error over time
+* A smoothing factor (α) is applied to reduce high-frequency noise
+
+**Rationale:**
+Derivative control is highly sensitive to measurement noise, especially in systems with high-resolution encoders. Without filtering, small fluctuations in sensor readings can produce large spikes in the derivative term, leading to unstable control signals.
+
+A simple exponential smoothing approach was used:
+
+* Lower α → smoother signal, more delay
+* Higher α → faster response, more noise
+
+A moderate value (e.g., α = 0.2) provides a balance between responsiveness and noise suppression.
+
+---
+
+## 2. Tuning Simulation 
+
+### 2.1 First-Run Safety Protocol
+
+When operating a high-power actuator (e.g., 100W motor) for the first time, safety is critical. 
+The following step-by-step procedure was used to determine controller gains safely:
+
+1. **Initializing with conservative parameters:**
+
+   * Set Ki = 0 and Kd = 0
+   * Use a very low Kp value
+
+2. **Applying output limits:**
+
+   * Restrict maximum control output (e.g., current or torque limits)
+   * Prevent sudden or high-speed motion
+
+3. **Testing under low-speed conditions:**
+
+   * Command small movements toward the setpoint
+   * Observe system response carefully
+
+4. **Gradually increasing Kp:**
+
+   * Increase Kp incrementally until the system responds adequately
+   * Stop increasing if oscillations or instability appear
+
+5. **Introducing integral gain (Ki):**
+
+   * Add a small Ki to eliminate steady-state error
+   * Ensure integral windup remains controlled
+
+6. **Introducing derivative gain (Kd):**
+
+   * Add Kd to reduce overshoot and damp oscillations
+   * Apply filtering to maintain stability
+
+7. **Monitoring system behavior continuously:**
+
+   * Observe position, velocity, and control output
+   * Ensure no sudden spikes or unsafe motion
+
+---
+
+## 3. Summary
+
+The implemented PID controller incorporates essential real-world considerations:
+
+* Anti-windup prevents instability during actuator saturation
+* Derivative filtering ensures robustness against sensor noise
+* A structured tuning protocol enables safe deployment on physical systems
+
+These design choices are critical for reliable and safe operation in practical robotic applications, particularly in systems with mechanical constraints such as backlash and hard-stops.
